@@ -1,0 +1,118 @@
+import { CheckCircle2 } from 'lucide-react'
+import { CTA } from '../components/CTA.jsx'
+import { PageHeader } from '../components/PageHeader.jsx'
+import { Reveal } from '../components/Motion.jsx'
+import { about } from '../content/siteData.js'
+
+export function AboutPage() {
+  return (
+    <>
+      <PageHeader
+        eyebrow="About"
+        title="Mining & environmental consultancy"
+        subtitle="AppGeo provides comprehensive mining consultancy services backed by qualified professionals in Geology, GIS, and regulatory compliance."
+      />
+
+      <section className="container-page pb-16 md:pb-20">
+        <div className="grid gap-12 md:grid-cols-2 md:items-start">
+          <Reveal>
+            <div>
+              <div className="kicker">About AppGeo</div>
+              <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-3xl">
+                Compliance-first, scientifically robust deliverables
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400 md:text-base">
+                {about.summary}
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400 md:text-base">
+                {about.managementNote}
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.05}>
+            <div>
+              <div className="kicker">Core strengths</div>
+              <ul className="mt-5 grid gap-4">
+                {about.strengths.map((t) => (
+                  <li key={t} className="flex gap-3">
+                    <CheckCircle2 className="mt-0.5 shrink-0 text-[color:var(--brand-700)]" size={18} />
+                    <span className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ── Field photos ── */}
+      <section className="container-page pb-16 md:pb-20">
+        <div className="divider" />
+        <Reveal>
+          <div className="mt-10">
+            <div className="kicker">From the field</div>
+            <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-3xl">
+              Our equipment in action
+            </h2>
+          </div>
+        </Reveal>
+        <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
+          {[
+            { src: '/images/dgps-tripod-sivaganga.png', alt: 'DGPS tripod setup at Sivaganga' },
+            { src: '/images/garmin-gps.png', alt: 'Garmin eTrex 22x GPS unit' },
+            { src: '/images/krypton-tripod.png', alt: 'Krypton DGPS base station' },
+          ].map((img, i) => (
+            <Reveal key={img.src} delay={i * 0.06}>
+              <div className="overflow-hidden rounded-2xl aspect-[4/3]">
+                <img src={img.src} alt={img.alt} className="h-full w-full object-cover" loading="lazy" />
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      <section className="container-page pb-16 md:pb-20">
+        <div className="divider" />
+        <div className="mt-10 grid gap-12 md:grid-cols-2 md:items-start">
+          <Reveal>
+            <div>
+              <div className="kicker">Infrastructure & resources</div>
+              <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-3xl">
+                Tools and networks that support delivery
+              </h2>
+              <div className="mt-5 grid gap-0 border-t border-slate-900/10 dark:border-slate-400/10">
+                {about.infrastructure.map((t, i) => (
+                  <div key={t} className="flex items-start gap-4 border-b border-slate-900/10 dark:border-slate-400/10 py-4">
+                    <span className="font-display text-lg font-bold text-slate-300 dark:text-slate-600">
+                      {(i + 1).toString().padStart(2, '0')}
+                    </span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 md:text-base">{t}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.05}>
+            <div>
+              <div className="kicker">Equipment</div>
+              <dl className="mt-5 grid gap-5">
+                {about.equipment.map((e) => (
+                  <div key={e.label} className="rounded-2xl border border-slate-900/5 dark:border-slate-400/10 bg-white/60 dark:bg-slate-800/40 p-5 backdrop-blur">
+                    <dt className="font-display text-[0.65rem] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                      {e.label}
+                    </dt>
+                    <dd className="mt-1 text-base font-medium text-slate-900 dark:text-slate-100">{e.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <CTA />
+    </>
+  )
+}
