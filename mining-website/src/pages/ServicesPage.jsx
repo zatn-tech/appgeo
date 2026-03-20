@@ -4,7 +4,8 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 import { CTA } from '../components/CTA.jsx'
 import { Reveal } from '../components/Motion.jsx'
 import { PageHeader } from '../components/PageHeader.jsx'
-import { services } from '../content/siteData.js'
+import { services as servicesFallback } from '../content/siteData.js'
+import { useSettings } from '../hooks/usePublicContent.js'
 
 const serviceIcons = [Compass, Droplets, MapPinned, Shield, Layers, ClipboardCheck]
 const serviceDetails = {
@@ -17,6 +18,8 @@ const serviceDetails = {
 
 export function ServicesPage() {
   const [openIdx, setOpenIdx] = useState(0)
+  const { data } = useSettings({ services: servicesFallback })
+  const services = data?.services || servicesFallback
 
   return (
     <>
@@ -42,7 +45,7 @@ export function ServicesPage() {
           </Reveal>
           <Reveal delay={0.12}>
             <div className="overflow-hidden rounded-2xl aspect-[4/3]">
-              <img src="/images/dgps-field-vehicle.png" alt="Field vehicle with DGPS equipment" className="h-full w-full object-cover" loading="lazy" />
+              <img src="/images/dgps-field-vehicle.png" alt="Field vehicle with DGPS unit" className="h-full w-full object-cover" loading="lazy" />
             </div>
           </Reveal>
         </div>

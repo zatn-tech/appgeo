@@ -4,10 +4,13 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 import { CTA } from '../components/CTA.jsx'
 import { Reveal } from '../components/Motion.jsx'
 import { PageHeader } from '../components/PageHeader.jsx'
-import { solutions } from '../content/siteData.js'
+import { solutions as solutionsFallback } from '../content/siteData.js'
+import { useSettings } from '../hooks/usePublicContent.js'
 
 export function SolutionsPage() {
   const [openIdx, setOpenIdx] = useState(0)
+  const { data } = useSettings({ solutions: solutionsFallback })
+  const solutions = data?.solutions || solutionsFallback
 
   return (
     <>

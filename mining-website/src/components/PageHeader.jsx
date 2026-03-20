@@ -25,11 +25,11 @@ export function PageHeader({ eyebrow, title, subtitle, children, width = 'defaul
             {eyebrow ? (
               <div className="kicker">{eyebrow}</div>
             ) : null}
-            <h1 className="font-display mt-4 text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-6xl">
+            <h1 className="page-title mt-4">
               <span className="gradient-text">{title}</span>
             </h1>
             {subtitle ? (
-              <p className="mt-5 text-base leading-relaxed text-slate-600 dark:text-slate-400 md:text-lg">
+              <p className="page-subtitle mt-5">
                 {subtitle}
               </p>
             ) : null}

@@ -1,41 +1,34 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { CTA } from '../components/CTA.jsx'
 import { PageHeader } from '../components/PageHeader.jsx'
-import { gallerySections } from '../content/galleryData.js'
+import { gallerySections as galleryFallbackSections } from '../content/galleryData.js'
+import { useGallery } from '../hooks/usePublicContent.js'
 
 export function GalleryPage() {
+  const { data: galleryRes } = useGallery(galleryFallbackSections)
+  const gallerySections = galleryRes?.gallery || galleryFallbackSections
+  const flatImages = (gallerySections || []).flatMap((section) => section.images || [])
+
   const [activeIndex, setActiveIndex] = useState(-1)
   const [slideDirection, setSlideDirection] = useState(1)
   const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 })
   const [isImageLoading, setIsImageLoading] = useState(false)
   const [touchStartX, setTouchStartX] = useState(0)
-  const [expandedSections, setExpandedSections] = useState(() =>
-    Object.fromEntries(gallerySections.map((section) => [section.slug, true])),
-  )
-  const flatImages = gallerySections.flatMap((section) => section.images)
-  const sectionsWithOffset = gallerySections.map((section, idx) => {
-    const start = gallerySections.slice(0, idx).reduce((acc, s) => acc + s.images.length, 0)
-    return { ...section, start }
-  })
 
-  function showPrev() {
+  const showPrev = useCallback(() => {
     setSlideDirection(-1)
     setIsImageLoading(true)
     setActiveIndex((idx) => (idx - 1 + flatImages.length) % flatImages.length)
-  }
+  }, [flatImages.length])
 
-  function showNext() {
+  const showNext = useCallback(() => {
     setSlideDirection(1)
     setIsImageLoading(true)
     setActiveIndex((idx) => (idx + 1) % flatImages.length)
-  }
-
-  function toggleSection(slug) {
-    setExpandedSections((prev) => ({ ...prev, [slug]: !prev[slug] }))
-  }
+  }, [flatImages.length])
 
   useEffect(() => {
     if (activeIndex < 0) return
@@ -52,26 +45,7 @@ export function GalleryPage() {
       window.removeEventListener('keydown', onKeyDown)
       document.body.style.overflow = ''
     }
-  }, [activeIndex])
-
-  useEffect(() => {
-    if (activeIndex < 0) return
-    const next = flatImages[(activeIndex + 1) % flatImages.length]?.src
-    const prev = flatImages[(activeIndex - 1 + flatImages.length) % flatImages.length]?.src
-    ;[next, prev].forEach((src) => {
-      if (!src) return
-      const img = new Image()
-      img.src = src
-    })
-  }, [activeIndex, flatImages])
-
-  const activeSection =
-    activeIndex >= 0
-      ? sectionsWithOffset.find(
-          (section) =>
-            activeIndex >= section.start && activeIndex < section.start + section.images.length,
-        )
-      : null
+  }, [activeIndex, showNext, showPrev])
 
   return (
     <>
@@ -83,55 +57,24 @@ export function GalleryPage() {
       />
 
       <section className="container-wide pb-16 md:pb-24">
-        <div className="space-y-10 md:space-y-12">
-          {sectionsWithOffset.map((section) => (
-            <div key={section.slug}>
-              <div className="mb-4 flex items-center justify-between gap-3 md:mb-5">
-                <div className="flex items-center gap-3">
-                  <h2 className="font-display text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-2xl">
-                    {section.title}
-                  </h2>
-                  <span className="pill">{section.images.length} photos</span>
-                </div>
-                <button
-                  type="button"
-                  className="btn-ghost inline-flex items-center gap-2"
-                  onClick={() => toggleSection(section.slug)}
-                >
-                  {expandedSections[section.slug] ? (
-                    <>
-                      Collapse <ChevronUp size={16} />
-                    </>
-                  ) : (
-                    <>
-                      Expand <ChevronDown size={16} />
-                    </>
-                  )}
-                </button>
-              </div>
-              {expandedSections[section.slug] ? (
-                <div className={section.images.length <= 6 ? 'grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 xl:grid-cols-4' : 'columns-2 gap-3 md:columns-3 md:gap-4 xl:columns-4'}>
-                  {section.images.map((img, i) => (
-                    <button
-                      key={img.src}
-                      type="button"
-                      className="group mb-3 block w-full break-inside-avoid overflow-hidden rounded-2xl border border-slate-900/5 dark:border-slate-400/10 bg-white/60 dark:bg-slate-800/40 text-left md:mb-4"
-                      onClick={() => {
-                        setIsImageLoading(true)
-                        setActiveIndex(section.start + i)
-                      }}
-                    >
-                      <img
-                        src={img.src}
-                        alt={img.alt}
-                        className="h-auto w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                        loading="lazy"
-                      />
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
+        <div className={flatImages.length <= 6 ? 'grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 xl:grid-cols-4' : 'columns-2 gap-3 md:columns-3 md:gap-4 xl:columns-4'}>
+          {flatImages.map((img, i) => (
+            <button
+              key={`${img.src}-${i}`}
+              type="button"
+              className="group mb-3 block w-full break-inside-avoid overflow-hidden rounded-2xl border border-slate-900/5 dark:border-slate-400/10 bg-white/60 dark:bg-slate-800/40 text-left md:mb-4"
+              onClick={() => {
+                setIsImageLoading(true)
+                setActiveIndex(i)
+              }}
+            >
+              <img
+                src={img.src}
+                alt={img.alt}
+                className="h-auto w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                loading="lazy"
+              />
+            </button>
           ))}
         </div>
       </section>
@@ -160,7 +103,7 @@ export function GalleryPage() {
 
               <div className="fixed top-4 left-4 z-[2147483647] rounded-xl border border-white/25 bg-black/55 px-3 py-2 text-white backdrop-blur">
                 <div className="text-xs font-semibold tracking-wide uppercase opacity-90">
-                  {activeSection?.title || 'Gallery'}
+                  Gallery
                 </div>
                 <div className="mt-0.5 text-sm font-semibold">
                   {activeIndex + 1} / {flatImages.length}

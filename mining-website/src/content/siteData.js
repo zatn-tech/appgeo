@@ -35,7 +35,7 @@ export const nav = [
 export const quickStats = [
   { label: 'Nature of business', value: 'Consultancy' },
   { label: 'Focus', value: 'Minor Mineral + Environment' },
-  { label: 'Region', value: 'Tamil Nadu' },
+  { label: 'Region', value: 'All over India' },
   { label: 'Delivery', value: 'Timely & compliant' },
 ]
 
@@ -94,39 +94,43 @@ export const projects = []
 export const team = [
   {
     name: 'Krishnan Chellammal',
-    role: 'Managing Director (MSc, MBA, PhD)',
-    bio: 'Chellammal is a multidisciplinary professional with expertise in environmental studies, geosciences, and project management. As the Director of the company, she leads the organization in delivering environmental and geological consultancy services, including environmental clearance documentation, regulatory compliance, and project planning. Her leadership focuses on sustainable development and providing reliable technical solutions across multiple disciplines.',
+    education: 'MSc, MBA, PhD',
+    role: 'Managing Director',
+    bio: 'A highly accomplished multidisciplinary professional, she leads the organization with strategic vision and technical excellence. With over 30 years of experience in administration and development, she drives the organization towards sustainable growth, delivering dependable and high-quality solutions across multiple disciplines. - chellamal',
     photo: '/images/md.png',
-    photoPosition: '50% 20%',
+    photoPosition: '50% 18%',
   },
   {
     name: 'Manivannan Rahulji',
-    role: 'Director (BE)',
-    bio: 'Manivannan Rahulji supports the planning, delivery, and management of quarrying, sand mining, and infrastructure-linked mineral projects across Tamil Nadu. He contributes to project coordination, regulatory processes, and operational management to ensure efficient and compliant project execution.',
+    education: 'BE',
+    role: 'Director',
+    bio: 'Manivannan Rahulji supports the planning, delivery, and management of quarrying, sand mining, and infrastructure-linked mineral projects across India. He contributes to project coordination, regulatory processes, and operational management to ensure efficient and compliant project execution.',
     photo: '/images/manivannan.png',
     photoPosition: '50% 18%',
   },
   {
     name: 'Judge Raja Ramadurai',
-    role: 'Director (BE)',
+    education: 'BE',
+    role: 'Director',
     bio: 'Judge Raja Ramadurai works closely with the technical and compliance teams to support the delivery of reliable and efficient consulting services. He contributes to organizational oversight and ensures that project activities align with regulatory and professional standards.',
     photo: '/images/judge.png',
     photoPosition: '50% 16%',
   },
   {
     name: 'R. Boominathan',
-    role: 'Founder (MBA)',
+    education: 'MBA',
+    role: 'Founder',
     bio: 'A visionary and results-driven leader with over 15 years of distinguished experience in the mining industry. Known for strong strategic insight and exceptional analytical capabilities, he brings a structured approach to solving complex and high-impact challenges. With deep domain expertise and a commitment to excellence, he consistently delivers innovative, practical, and sustainable solutions for critical and technically demanding projects.',
     photo: '/images/founder.png',
-    photoPosition: '50% 28%',
+    photoPosition: '50% 24%',
   },
 ]
 
 export const about = {
   summary:
-    'AppGeo provides comprehensive mining consultancy services, supported by a team of highly qualified and motivated professionals passionate about Earth Sciences.',
+    'AppGeo Private Limited was established on 3rd July 2022 and is a professional mining, environment and geo technical consultancy firm providing end to end technical, regulatory, and advisory services to mining, infrastructure, and development projects. The company focuses on delivering compliant, scientifically sound, and cost-effective solutions in line with the requirements of the Directorate of Geology & Mining (DGM), SEAC/SEIAA, and other statutory authorities.',
   managementNote:
-    'Managed by Geology, GIS, MBA, Engineer professionals with hands on exp across quarry, replenishment studies and minor mineral projects across India.',
+    'The company was officially registered under the Company Act on 21st February, 2024 with the Ministry of Corporate Affairs.',
   strengths: [
     'Strong focus on statutory compliance',
     'Scientifically robust and regulator friendly documentation',
@@ -137,11 +141,7 @@ export const about = {
     'Fully equipped office setup with GIS and planning software',
     'Access to licensed surveyors and laboratories',
     'Network of senior consultants in mining, environment, and geology',
-    'Field survey equipment and digital mapping tools',
-  ],
-  equipment: [
-    { label: 'DGPS model', value: 'Krypton (as per profile)' },
-    { label: 'GPS model', value: 'GARMIN eTrex 22x (as per profile)' },
+    'Field survey tools and digital mapping workflows',
   ],
 }
 

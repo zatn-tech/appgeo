@@ -2,9 +2,14 @@ import { useMemo, useState } from 'react'
 import { Mail, MapPin, Phone } from 'lucide-react'
 import { Reveal } from '../components/Motion.jsx'
 import { PageHeader } from '../components/PageHeader.jsx'
-import { site } from '../content/siteData.js'
+import { site as siteFallback } from '../content/siteData.js'
+import { useSettings } from '../hooks/usePublicContent.js'
+import { apiClient } from '../lib/apiClient.js'
 
 export function ContactPage() {
+  const { data: settings } = useSettings({ site: siteFallback })
+  const site = settings?.site || siteFallback
+
   const [status, setStatus] = useState('idle')
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState({ name: '', phone: '', need: '' })
@@ -45,19 +50,27 @@ export function ContactPage() {
     if (Object.keys(nextErrors).length > 0) return
 
     setSubmitting(true)
-    setStatus('sent')
-    setTimeout(() => {
-      setStatus('idle')
-      setSubmitting(false)
-      setForm({ name: '', phone: '', need: '' })
-    }, 1200)
+    setStatus('sending')
+
+    ;(async () => {
+      try {
+        await apiClient.submitContact(form)
+        setStatus('sent')
+        setForm({ name: '', phone: '', need: '' })
+      } catch (err) {
+        setErrors((prev) => ({ ...prev, form: err?.message || 'Failed to send message' }))
+        setStatus('idle')
+      } finally {
+        setSubmitting(false)
+      }
+    })()
   }
 
   return (
     <>
       <PageHeader
         eyebrow="Contact"
-        title="Need Survey, Mine Planning, Documentation, or RC approval support?"
+        title="Need Survey, Mine Planning, Documentation, or Environmental Clearance (EC) approval support?"
         subtitle="Get in touch with AppGeo for compliance-first project support."
         width="wide"
       />
@@ -127,6 +140,11 @@ export function ContactPage() {
                     Or email us
                   </a>
                 </div>
+                {errors.form ? (
+                  <p className="text-xs text-rose-600 dark:text-rose-400" role="alert">
+                    {errors.form}
+                  </p>
+                ) : null}
               </form>
             </div>
           </Reveal>
@@ -176,10 +194,10 @@ export function ContactPage() {
               <div className="mt-8">
                 <div className="kicker">Service area</div>
                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 md:text-base">
-                  Tamil Nadu
+                  All over India — field surveys, documentation, and regulatory support for projects across the country.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {['Dharmapuri', 'Salem', 'Namakkal', 'Karur', 'Erode'].map((d) => (
+                  {['Pan-India', 'On-site support', 'EC & mining plans', 'Compliance-first'].map((d) => (
                     <span key={d} className="pill">{d}</span>
                   ))}
                 </div>

@@ -1,9 +1,14 @@
 import { Link } from 'react-router-dom'
 import { Mail, MapPin, Phone } from 'lucide-react'
 import { Logo } from './Logo.jsx'
-import { nav, site } from '../content/siteData.js'
+import { nav as navFallback, site as siteFallback } from '../content/siteData.js'
+import { useSettings } from '../hooks/usePublicContent.js'
 
 export function Footer() {
+  const { data: settings } = useSettings({ site: siteFallback, nav: navFallback })
+  const nav = settings?.nav || navFallback
+  const site = settings?.site || siteFallback
+
   return (
     <footer className="footer-glass relative">
       <div className="container-page py-10">

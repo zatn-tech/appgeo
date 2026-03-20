@@ -2,15 +2,19 @@ import { CheckCircle2 } from 'lucide-react'
 import { CTA } from '../components/CTA.jsx'
 import { PageHeader } from '../components/PageHeader.jsx'
 import { Reveal } from '../components/Motion.jsx'
-import { about } from '../content/siteData.js'
+import { about as aboutFallback } from '../content/siteData.js'
+import { useSettings } from '../hooks/usePublicContent.js'
 
 export function AboutPage() {
+  const { data: settings } = useSettings({ about: aboutFallback })
+  const about = settings?.about || aboutFallback
+
   return (
     <>
       <PageHeader
         eyebrow="About"
-        title="Mining & environmental consultancy"
-        subtitle="AppGeo provides comprehensive mining consultancy services backed by qualified professionals in Geology, GIS, and regulatory compliance."
+        title="MINING & ENVIRONMENTAL CONSULTANCY"
+        subtitle="AppGeo Private Limited is a professional mining, environment and geo technical consultancy firm."
       />
 
       <section className="container-page pb-16 md:pb-20">
@@ -53,7 +57,7 @@ export function AboutPage() {
           <div className="mt-10">
             <div className="kicker">From the field</div>
             <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-3xl">
-              Our equipment in action
+              Fieldwork in action
             </h2>
           </div>
         </Reveal>
@@ -74,7 +78,7 @@ export function AboutPage() {
 
       <section className="container-page pb-16 md:pb-20">
         <div className="divider" />
-        <div className="mt-10 grid gap-12 md:grid-cols-2 md:items-start">
+        <div className="mt-10 grid gap-12 md:grid-cols-1 md:items-start">
           <Reveal>
             <div>
               <div className="kicker">Infrastructure & resources</div>
@@ -91,22 +95,6 @@ export function AboutPage() {
                   </div>
                 ))}
               </div>
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.05}>
-            <div>
-              <div className="kicker">Equipment</div>
-              <dl className="mt-5 grid gap-5">
-                {about.equipment.map((e) => (
-                  <div key={e.label} className="rounded-2xl border border-slate-900/5 dark:border-slate-400/10 bg-white/60 dark:bg-slate-800/40 p-5 backdrop-blur">
-                    <dt className="font-display text-[0.65rem] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
-                      {e.label}
-                    </dt>
-                    <dd className="mt-1 text-base font-medium text-slate-900 dark:text-slate-100">{e.value}</dd>
-                  </div>
-                ))}
-              </dl>
             </div>
           </Reveal>
         </div>

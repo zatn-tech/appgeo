@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, ArrowUpRight, ChevronDown } from 'lucide-react'
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { CTA } from '../components/CTA.jsx'
 import { GeoVisual } from '../components/GeoVisual.jsx'
 import { Reveal } from '../components/Motion.jsx'
-import { about, quickStats, services, site, solutions } from '../content/siteData.js'
+import { about as aboutFallback, quickStats as quickStatsFallback, services as servicesFallback, site as siteFallback, solutions as solutionsFallback } from '../content/siteData.js'
+import { useSettings } from '../hooks/usePublicContent.js'
+import { apiClient } from '../lib/apiClient.js'
 
-const heroSlides = [
+const fallbackHeroSlides = [
   '/images/gallery/1yr-anniversary/1yr-anniversary-012.jpg',
   '/images/gallery/dgps-gps/dgps-gps-009.jpg',
   '/images/gallery/pongal-cel/pongal-cel-004.jpg',
@@ -17,17 +19,63 @@ const heroSlides = [
 ]
 
 export function HomePage() {
-  const reduce = useReducedMotion()
+  const { data: settingsRes } = useSettings({
+    site: siteFallback,
+    about: aboutFallback,
+    quickStats: quickStatsFallback,
+    solutions: solutionsFallback,
+    services: servicesFallback,
+    projects: [],
+  })
+
+  const site = settingsRes?.site || siteFallback
+  const about = settingsRes?.about || aboutFallback
+  const quickStats = settingsRes?.quickStats || quickStatsFallback
+  const services = settingsRes?.services || servicesFallback
+  const solutions = settingsRes?.solutions || solutionsFallback
+
   const { scrollY } = useScroll()
   const gridY = useTransform(scrollY, [0, 900], [0, 60])
   const [slideIdx, setSlideIdx] = useState(0)
+  const [heroSlides, setHeroSlides] = useState([])
+  const [heroSlidesStatus, setHeroSlidesStatus] = useState('loading') // loading | ready | error
 
   useEffect(() => {
+    let cancelled = false
+    apiClient
+      .getHomeSlides()
+      .then((res) => {
+        if (cancelled) return
+        const slides = (res?.slides || []).map((s) => s.src).filter(Boolean)
+        setHeroSlides(slides)
+        setSlideIdx(0)
+        setHeroSlidesStatus('ready')
+      })
+      .catch(() => {
+        if (cancelled) return
+        // If the API fails, fall back to bundled slides (but not while still loading).
+        setHeroSlides(fallbackHeroSlides)
+        setSlideIdx(0)
+        setHeroSlidesStatus('error')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const slides = useMemo(() => {
+    if (heroSlidesStatus === 'loading') return []
+    return heroSlides.length ? heroSlides : fallbackHeroSlides
+  }, [heroSlides, heroSlidesStatus])
+
+  useEffect(() => {
+    if (!slides.length) return
+    const count = slides.length
     const timer = setInterval(() => {
-      setSlideIdx((prev) => (prev + 1) % heroSlides.length)
+      setSlideIdx((prev) => (prev + 1) % count)
     }, 3200)
     return () => clearInterval(timer)
-  }, [])
+  }, [slides.length])
 
   return (
     <>
@@ -76,24 +124,28 @@ export function HomePage() {
               <div className="mt-10 flex items-center gap-6 text-sm text-slate-500 dark:text-slate-400">
                 <span className="font-display font-semibold tracking-wider uppercase text-xs">{site.domain}</span>
                 <span className="h-4 w-px bg-slate-300 dark:bg-slate-600" />
-                <span>Chennai, Tamil Nadu</span>
+                <span>Serving all over India</span>
               </div>
             </Reveal>
           </div>
 
           <div className="relative hidden md:block">
             <div className="relative h-[36rem] overflow-hidden rounded-3xl border border-slate-900/5 dark:border-slate-400/10 bg-white/50 dark:bg-slate-800/40">
-              {heroSlides.map((src, i) => (
-                <img
-                  key={src}
-                  src={src}
-                  alt={`AppGeo hero slide ${i + 1}`}
-                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${i === slideIdx ? 'opacity-100' : 'opacity-0'}`}
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                />
-              ))}
+              {slides.length ? (
+                slides.map((src, i) => (
+                  <img
+                    key={src}
+                    src={src}
+                    alt={`AppGeo hero slide ${i + 1}`}
+                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${i === slideIdx ? 'opacity-100' : 'opacity-0'}`}
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                  />
+                ))
+              ) : (
+                <div className="absolute inset-0 animate-pulse rounded-3xl bg-slate-100/30 dark:bg-slate-800/45" />
+              )}
               <div className="absolute inset-x-0 bottom-4 z-10 flex justify-center gap-2">
-                {heroSlides.map((_, i) => (
+                {slides.map((_, i) => (
                   <button
                     key={i}
                     type="button"
@@ -175,7 +227,7 @@ export function HomePage() {
           <Reveal>
             <div className="kicker">What we do</div>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-5xl">
-              Built for compliance-Excellence in mine planning - geospatial accuracy-and consistent on-time delivery.
+              Built for compliance · Excellence in Mine Planning · Geospatial accuracy · Consistent on-time delivery.
             </h2>
           </Reveal>
         </div>

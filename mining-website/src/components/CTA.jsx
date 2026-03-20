@@ -11,7 +11,7 @@ export function CTA() {
             <div>
               <div className="kicker">Next step</div>
               <h2 className="font-display mt-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-4xl">
-                Need Survey, Mine Planning, Documentation, or RC approval Support?
+                Need Survey, Mine Planning, Documentation, or Environmental Clearance (EC) approval support?
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600 dark:text-slate-400 md:text-base">
                 Share your site location, mineral type, and requirement.

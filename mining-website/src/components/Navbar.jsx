@@ -4,7 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, Moon, Sun, X } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext.jsx'
 import { Logo } from './Logo.jsx'
-import { nav, site } from '../content/siteData.js'
+import { nav as navFallback, site as siteFallback } from '../content/siteData.js'
+import { useSettings } from '../hooks/usePublicContent.js'
 
 function NavItem({ to, children, onClick }) {
   return (
@@ -27,9 +28,11 @@ function NavItem({ to, children, onClick }) {
 
 export function Navbar() {
   const [open, setOpen] = useState(false)
-  const links = useMemo(() => nav, [])
+  const { data: settings } = useSettings({ site: siteFallback, nav: navFallback })
+  const links = useMemo(() => settings?.nav || navFallback, [settings?.nav])
   const { theme, toggleTheme } = useTheme()
   const navRef = useRef(null)
+  const site = settings?.site || siteFallback
 
   useEffect(() => {
     if (!open) return
