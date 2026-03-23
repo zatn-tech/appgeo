@@ -83,13 +83,13 @@ export function HomePage() {
       <section className="relative min-h-[92svh] overflow-hidden">
         <motion.div style={{ y: gridY }} className="absolute inset-0 -z-10 hero-grid hero-spotlight" />
 
-        <div className="container-page relative grid min-h-[92svh] items-center md:grid-cols-[1.1fr_0.9fr]">
+        <div className="container-page relative grid min-h-[92svh] items-center md:grid-cols-[1fr_1fr] md:gap-12">
           {/* GeoVisual as ambient background on mobile */}
           <div className="pointer-events-none absolute inset-0 z-0 opacity-25 md:hidden">
             <GeoVisual className="h-full w-full" mobileBackground />
           </div>
 
-          <div className="relative z-10 pt-14 pb-8 md:pt-0 md:pb-0">
+          <div className="relative z-10 pt-10 pb-6 md:pt-0 md:pb-0">
             <Reveal>
               <p className="kicker">{site.tagline2}</p>
               <div className="mt-5">
@@ -130,14 +130,14 @@ export function HomePage() {
           </div>
 
           <div className="relative hidden md:block">
-            <div className="relative h-[36rem] overflow-hidden rounded-3xl border border-slate-900/5 dark:border-slate-400/10 bg-white/50 dark:bg-slate-800/40">
+            <div className="relative h-[36rem] w-full overflow-hidden rounded-3xl border border-slate-900/5 dark:border-slate-400/10 bg-white/50 dark:bg-slate-800/40">
               {slides.length ? (
                 slides.map((src, i) => (
                   <img
                     key={src}
                     src={src}
                     alt={`AppGeo hero slide ${i + 1}`}
-                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${i === slideIdx ? 'opacity-100' : 'opacity-0'}`}
+                    className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ${i === slideIdx ? 'opacity-100' : 'opacity-0'}`}
                     loading={i === 0 ? 'eager' : 'lazy'}
                   />
                 ))

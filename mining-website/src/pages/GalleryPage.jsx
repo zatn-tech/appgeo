@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
@@ -8,8 +8,11 @@ import { gallerySections as galleryFallbackSections } from '../content/galleryDa
 import { useGallery } from '../hooks/usePublicContent.js'
 
 export function GalleryPage() {
-  const { data: galleryRes } = useGallery(galleryFallbackSections)
-  const gallerySections = galleryRes?.gallery || galleryFallbackSections
+  const { data: galleryRes, loading } = useGallery(galleryFallbackSections)
+
+  // Important: while loading we should NOT render fallback/static images, otherwise the browser will
+  // immediately request them and inflate network usage.
+  const gallerySections = loading ? [] : galleryRes?.gallery || galleryFallbackSections
   const flatImages = (gallerySections || []).flatMap((section) => section.images || [])
 
   const [activeIndex, setActiveIndex] = useState(-1)
@@ -17,6 +20,36 @@ export function GalleryPage() {
   const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 })
   const [isImageLoading, setIsImageLoading] = useState(false)
   const [touchStartX, setTouchStartX] = useState(0)
+
+  const INITIAL_VISIBLE_COUNT = 12
+  const PAGE_SIZE = 12
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT)
+  const sentinelRef = useRef(null)
+
+  useEffect(() => {
+    if (loading) return
+    setVisibleCount(Math.min(INITIAL_VISIBLE_COUNT, flatImages.length))
+  }, [loading, flatImages.length])
+
+  useEffect(() => {
+    if (loading) return
+    if (visibleCount >= flatImages.length) return
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+        if (!entry?.isIntersecting) return
+
+        setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, flatImages.length))
+      },
+      { root: null, rootMargin: '600px 0px', threshold: 0 }
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [loading, flatImages.length, visibleCount])
 
   const showPrev = useCallback(() => {
     setSlideDirection(-1)
@@ -58,25 +91,37 @@ export function GalleryPage() {
 
       <section className="container-wide pb-16 md:pb-24">
         <div className={flatImages.length <= 6 ? 'grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 xl:grid-cols-4' : 'columns-2 gap-3 md:columns-3 md:gap-4 xl:columns-4'}>
-          {flatImages.map((img, i) => (
-            <button
-              key={`${img.src}-${i}`}
-              type="button"
-              className="group mb-3 block w-full break-inside-avoid overflow-hidden rounded-2xl border border-slate-900/5 dark:border-slate-400/10 bg-white/60 dark:bg-slate-800/40 text-left md:mb-4"
-              onClick={() => {
-                setIsImageLoading(true)
-                setActiveIndex(i)
-              }}
-            >
-              <img
-                src={img.src}
-                alt={img.alt}
-                className="h-auto w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                loading="lazy"
-              />
-            </button>
-          ))}
+          {loading
+            ? Array.from({ length: 12 }).map((_, i) => (
+                <div
+                  // Use a div (not button) so we don't show interactive UI before images exist.
+                  key={`skeleton-${i}`}
+                  className="mb-3 block w-full break-inside-avoid overflow-hidden rounded-2xl border border-slate-900/5 dark:border-slate-400/10 bg-white/60 dark:bg-slate-800/40 md:mb-4"
+                >
+                  <div className="aspect-[4/3] w-full animate-pulse bg-slate-200/40 dark:bg-slate-700/40" />
+                </div>
+              ))
+            : flatImages.slice(0, visibleCount).map((img, i) => (
+                <button
+                  key={`${img.src}-${i}`}
+                  type="button"
+                  className="group mb-3 block w-full break-inside-avoid overflow-hidden rounded-2xl border border-slate-900/5 dark:border-slate-400/10 bg-white/60 dark:bg-slate-800/40 text-left md:mb-4"
+                  onClick={() => {
+                    setIsImageLoading(true)
+                    setActiveIndex(i)
+                  }}
+                >
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    className="h-auto w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    loading="lazy"
+                  />
+                </button>
+              ))}
         </div>
+
+        {!loading && visibleCount < flatImages.length ? <div ref={sentinelRef} className="h-1 w-full" /> : null}
       </section>
 
       {activeIndex >= 0
